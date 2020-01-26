@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:treni/model/solution_details.dart';
+import 'package:treni/db_repository.dart';
+import 'package:treni/solution_details.dart';
 import 'package:treni/model/solutions.dart';
 import 'package:treni/model/station.dart';
 import 'package:http/http.dart' as http;
 
 import 'model/palette.dart';
+import 'model/train_route.dart';
 
 class SolutionListPage extends StatefulWidget {
-  final Station from;
-  final Station to;
+  final TrainRoute route;
   final DateTime time;
   final DateTime date;
 
   const SolutionListPage(
       {Key key,
-      @required this.from,
-      @required this.to,
+      @required this.route,
       @required this.time,
       @required this.date})
       : super(key: key);
@@ -35,13 +35,13 @@ class _SolutionListPageState extends State<SolutionListPage> {
   }
 
   void _search() async {
-    if (widget.from != null && widget.to != null) {
-      print(DateFormat('yyyy-MM-ddTHH:mm:ss').format(widget.date));
+    if (widget.route.from != null && widget.route.to != null) {
+      print("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/${widget.route.from.id}/${widget.route.to.id}/${DateFormat('yyyy-MM-dd').format(widget.date)}T${DateFormat('HH:mm:ss').format(widget.time)}");
       final res = await http.get(
-          "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/${widget.from.getCode()}/${widget.to.getCode()}/${DateFormat('yyyy-MM-dd').format(widget.date)}T${DateFormat('HH:mm:ss').format(widget.time)}");
+          "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/${widget.route.from.id}/${widget.route.to.id}/${DateFormat('yyyy-MM-dd').format(widget.date)}T${DateFormat('HH:mm:ss').format(widget.time)}");
+      print(res.body);
       var sol = solutionRequestFromJson(res.body);
 
-      print(sol.soluzioni.length);
       setState(() {
         solutions = sol.soluzioni;
       });
@@ -54,17 +54,29 @@ class _SolutionListPageState extends State<SolutionListPage> {
       appBar: AppBar(
         title: Row(
           children: <Widget>[
-            Text("${widget.from.nomeBreve}"),
+            Text("${widget.route.from.nomeBreve}"),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Icon(Icons.arrow_forward),
             ),
             Flexible(
                 fit: FlexFit.loose,
-                child: Text("${widget.to.nomeBreve}",
+                child: Text("${widget.route.to.nomeBreve}",
                     overflow: TextOverflow.ellipsis, softWrap: false)),
           ],
         ),
+        actions: <Widget>[
+          IconButton(onPressed: () {
+            setState(() {
+              DbRepository.setFavoriteRoute(widget.route);
+              widget.route.favorite = !widget.route.favorite;
+            });
+
+            },
+            icon: Icon(widget.route.favorite ? Icons.favorite : Icons.favorite_border,)
+
+          )
+        ],
       ),
       body: SolutionListView(solutions: solutions),
     );
@@ -87,83 +99,119 @@ class _SolutionListViewState extends State<SolutionListView> {
   @override
   Widget build(BuildContext context) {
     if (widget.solutions != null) {
-      return ListView.builder(
-        shrinkWrap: true,
-        itemBuilder: (BuildContext context, int index) {
-          Soluzione sol = widget.solutions[index];
-          return InkWell(
-            onTap: () {
-              _solutionDetails(context, widget.solutions[index]);
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: ListTile(
-                title: Column(
-                  children: <Widget>[
-                    SolutionStation(
-                        time: sol.vehicles[0].orarioPartenza,
-                        station: sol.vehicles[0].origine),
-                    Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                          child: Icon(Icons.arrow_downward),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Icon(
-                            Icons.access_time,
-                            size: 16,
-                            color: Colors.black45,
+      if (widget.solutions.length > 0) {
+        return ListView.separated(
+          shrinkWrap: true,
+          itemBuilder: (BuildContext context, int index) {
+            Soluzione sol = widget.solutions[index];
+            return Column(
+              children: <Widget>[
+                InkWell(
+                  onTap: () {
+                    _solutionDetails(context, widget.solutions[index]);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: ListTile(
+                      title: Column(
+                        children: <Widget>[
+                          SolutionStation(
+                              time: sol.vehicles[0].orarioPartenza,
+                              station: sol.vehicles[0].origine),
+                          Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 18.0),
+                                child: Icon(Icons.arrow_downward),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Icon(
+                                  Icons.access_time,
+                                  size: 14,
+                                  color: Theme
+                                      .of(context)
+                                      .disabledColor,
+                                ),
+                              ),
+                              Text(
+                                sol.durata,
+                                style: TextStyle(color: Theme
+                                    .of(context)
+                                    .disabledColor),
+                              ),
+                            ],
                           ),
-                        ),
-                        Text(
-                          sol.durata,
-                          style: TextStyle(color: Colors.black45),
-                        ),
-                      ],
-                    ),
-                    SolutionStation(
-                        time:
-                            sol.vehicles[sol.vehicles.length - 1].orarioArrivo,
-                        station:
-                            sol.vehicles[sol.vehicles.length - 1].destinazione),
-                  ],
-                ),
-                subtitle: Container(
-                  height: 30,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Flexible(
-                          fit: FlexFit.loose,
-                          child: Text(
-                            "${_cambi(sol.vehicles.length - 1)}",
-                            overflow: TextOverflow.fade,
-                          )),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: VehicleName(
-                              categoriaDescrizione:
-                                  sol.vehicles[index].categoriaDescrizione,
-                              numeroTreno: sol.vehicles[index].numeroTreno,
-                            shape: Shape.Arrow,
-                          ),
-                        ),
-                        itemCount: sol.vehicles.length,
+                          SolutionStation(
+                              time:
+                              sol.vehicles[sol.vehicles.length - 1]
+                                  .orarioArrivo,
+                              station:
+                              sol.vehicles[sol.vehicles.length - 1]
+                                  .destinazione),
+                        ],
                       ),
-                    ],
+                      subtitle: Container(
+                        height: 30,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            Flexible(
+                                fit: FlexFit.loose,
+                                child: Text(
+                                  "${_cambi(sol.vehicles.length - 1)}",
+                                  overflow: TextOverflow.fade,
+                                  style: TextStyle(
+                                      fontSize: 13.0
+                                  ),
+                                )),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context, index) =>
+                                  Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: VehicleName(
+                                      categoriaDescrizione:
+                                      sol.vehicles[index].categoriaDescrizione,
+                                      numeroTreno: sol.vehicles[index]
+                                          .numeroTreno,
+                                      shape: Shape.Arrow,
+                                    ),
+                                  ),
+                              itemCount: sol.vehicles.length,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
+            );
+          },
+          itemCount: widget.solutions.length,
+          separatorBuilder: (BuildContext context, int index) {
+            return Divider();
+          },
+        );
+      } else {
+        return Container(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(Icons.not_interested, color: Theme.of(context).disabledColor, size: 80,),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("Nessuna soluzione trovata.\nProva a cercare altro.", style: TextStyle(color: Theme.of(context).disabledColor), textAlign: TextAlign.center,),
+                )
+              ],
             ),
-          );
-        },
-        itemCount: widget.solutions.length,
-      );
+          ),
+        );
+      }
     }
     return Center(child: CircularProgressIndicator());
   }
@@ -172,9 +220,9 @@ class _SolutionListViewState extends State<SolutionListView> {
     if (cambi == 0) {
       return "";
     } else if (cambi == 1) {
-      return "1 cambio";
+      return "1 cambio: ";
     }
-    return "$cambi cambi";
+    return "$cambi cambi:  ";
   }
 
   void _solutionDetails(BuildContext context, Soluzione solution) async {
@@ -211,7 +259,7 @@ class VehicleName extends StatelessWidget {
       color = Palette.red;
     }
     if (categoriaDescrizione.toLowerCase().startsWith("ic")) {
-      color = Palette.orange;
+      color = Palette.intercity;
     }
     if (categoriaDescrizione.toLowerCase().startsWith("italo")) {
       color = Palette.lightblue;
@@ -242,7 +290,7 @@ class VehicleName extends StatelessWidget {
                 child: Text(
               " $desc $numeroTreno ",
               style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12),
             )),
           ),
         ),
@@ -283,14 +331,14 @@ class SolutionStation extends StatelessWidget {
           padding: const EdgeInsets.all(4.0),
           child: Text(
             "${DateFormat.Hm().format(time)} ",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(4.0),
           child: Text(
             "$station",
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(fontSize: 16),
           ),
         ),
       ],

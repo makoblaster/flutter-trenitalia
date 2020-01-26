@@ -9,12 +9,49 @@ Train trainFromJson(String str) => Train.fromJson(json.decode(str));
 String trainToJson(Train data) => json.encode(data.toJson());
 
 class Train {
+  int getCurrentStationIndex() {
+    for (int i  = 0; i < fermate.length; i++){
+      if (fermate[i].stazione == stazioneUltimoRilevamento){
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  int getFermataPartenzaIndexByTime(DateTime orarioPartenza) {
+    for (int i  = 0; i < fermate.length; i++){
+      DateTime trainTime = DateTime.fromMillisecondsSinceEpoch(fermate[i].partenzaTeorica);
+      if (trainTime.hour == orarioPartenza.hour && trainTime.minute == orarioPartenza.minute){
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  int getFermataArrivoIndexByTime(DateTime orarioArrivo){
+    for (int i  = 0; i < fermate.length; i++){
+      DateTime trainTime = DateTime.fromMillisecondsSinceEpoch(fermate[i].programmata);
+      if (trainTime.hour == orarioArrivo.hour && trainTime.minute == orarioArrivo.minute){
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  Fermata getFermataPartenzaByTime(DateTime orarioPartenza){
+    return fermate.firstWhere((x) {
+      DateTime trainTime = DateTime.fromMillisecondsSinceEpoch(x.partenzaTeorica);
+      print("${trainTime.hour}:${trainTime.minute} - ${orarioPartenza.hour}:${orarioPartenza.minute}");
+      return trainTime.hour == orarioPartenza.hour && trainTime.minute == orarioPartenza.minute;
+    });
+  }
+
   String tipoTreno;
   dynamic orientamento;
   int codiceCliente;
   dynamic fermateSoppresse;
   dynamic dataPartenza;
-  List<Fermate> fermate;
+  List<Fermata> fermate;
   dynamic anormalita;
   dynamic provvedimenti;
   dynamic segnalazioni;
@@ -187,7 +224,7 @@ class Train {
     codiceCliente: json["codiceCliente"],
     fermateSoppresse: json["fermateSoppresse"],
     dataPartenza: json["dataPartenza"],
-    fermate: List<Fermate>.from(json["fermate"].map((x) => Fermate.fromJson(x))),
+    fermate: List<Fermata>.from(json["fermate"].map((x) => Fermata.fromJson(x))),
     anormalita: json["anormalita"],
     provvedimenti: json["provvedimenti"],
     segnalazioni: json["segnalazioni"],
@@ -354,6 +391,8 @@ class Train {
     "compDurata": compDurata,
     "compImgCambiNumerazione": compImgCambiNumerazione,
   };
+
+
 }
 
 class CambiNumero {
@@ -376,7 +415,7 @@ class CambiNumero {
   };
 }
 
-class Fermate {
+class Fermata {
   dynamic orientamento;
   dynamic kcNumTreno;
   String stazione;
@@ -413,7 +452,7 @@ class Fermate {
   int actualFermataType;
   dynamic materialeLabel;
 
-  Fermate({
+  Fermata({
     this.orientamento,
     this.kcNumTreno,
     this.stazione,
@@ -451,7 +490,7 @@ class Fermate {
     this.materialeLabel,
   });
 
-  factory Fermate.fromJson(Map<String, dynamic> json) => Fermate(
+  factory Fermata.fromJson(Map<String, dynamic> json) => Fermata(
     orientamento: json["orientamento"],
     kcNumTreno: json["kcNumTreno"],
     stazione: json["stazione"],

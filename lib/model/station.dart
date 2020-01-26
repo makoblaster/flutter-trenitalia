@@ -12,7 +12,7 @@ class Station {
   String nomeLungo;
   String nomeBreve;
   String label;
-  String id;
+  int id;
 
   Station({
     this.nomeLungo,
@@ -21,21 +21,34 @@ class Station {
     this.id,
   });
 
-  factory Station.fromJson(Map<String, dynamic> json) => Station(
-    nomeLungo: json["nomeLungo"],
-    nomeBreve: json["nomeBreve"],
-    label: json["label"] == null ? null : json["label"],
-    id: json["id"],
-  );
+  factory Station.fromJson(Map<String, dynamic> json) {
+    int id = extractId(json["id"]);
+
+    return Station(
+        nomeLungo: json["nomeLungo"],
+        nomeBreve: json["nomeBreve"],
+        label: json["label"] == null ? null : json["label"],
+        id: id
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     "nomeLungo": nomeLungo,
     "nomeBreve": nomeBreve,
     "label": label == null ? null : label,
-    "id": id,
+    "id": getFormattedId(),
   };
 
-  int getCode(){
-    return int.parse(id.substring(1));
+  Map<String, dynamic> toDbMap() => {
+    "nomeBreve": nomeBreve,
+    "id": id
+  };
+
+  String getFormattedId(){
+    return "S" + id.toString().padLeft(5, '0');
+  }
+
+  static int extractId(String sid){
+    return int.parse(sid.substring(1));
   }
 }
