@@ -4,15 +4,15 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:treni/model/palette.dart';
-import 'package:treni/model/solutions.dart';
+import 'package:treni/model/trenitalia/ti_solutions.dart';
 import 'package:http/http.dart' as http;
-import 'package:treni/model/train.dart';
-import 'package:treni/model/train_origin.dart';
+import 'package:treni/model/trenitalia/ti_train.dart';
+import 'package:treni/model/trains/train_origin.dart';
 
 import 'solution_list.dart';
 
 class SolutionDetailsPage extends StatefulWidget {
-  final Soluzione solution;
+  final TISoluzione solution;
 
   const SolutionDetailsPage({Key key, this.solution}) : super(key: key);
 
@@ -39,7 +39,7 @@ class _SolutionPageState extends State<SolutionDetailsPage> {
             physics: const AlwaysScrollableScrollPhysics(),
             itemCount: widget.solution.vehicles.length,
             itemBuilder: (context, index) {
-              Vehicle vehicle = widget.solution.vehicles[index];
+              TIVehicle vehicle = widget.solution.vehicles[index];
               return FutureBuilder(
                 future: _trainDetails(vehicle),
                 builder: (context, snapshot) {
@@ -48,14 +48,14 @@ class _SolutionPageState extends State<SolutionDetailsPage> {
                       padding: const EdgeInsets.all(32.0),
                       child: CircularProgressIndicator(),
                     ));
-                  Train train = snapshot.data;
+                  TITrain train = snapshot.data;
 
                   int originIndex = train.getFermataPartenzaIndexByTime(vehicle.orarioPartenza);
-                  Fermata origin = train.fermate[originIndex];
+                  TIFermata origin = train.fermate[originIndex];
 
                   int destinationIndex =
                       train.getFermataArrivoIndexByTime(vehicle.orarioArrivo);
-                  Fermata destination = train.fermate[destinationIndex];
+                  TIFermata destination = train.fermate[destinationIndex];
 
                   int currentStation = train.getCurrentStationIndex();
 
@@ -90,7 +90,7 @@ class _SolutionPageState extends State<SolutionDetailsPage> {
                           ),
                         expanded: ListView.builder(physics: NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
-                          Fermata fermata = train.fermate[index];
+                          TIFermata fermata = train.fermate[index];
                           DateTime arrivo;
                           if (fermata.arrivoTeorico != null) {
                             arrivo = DateTime.fromMillisecondsSinceEpoch(
@@ -124,7 +124,7 @@ class _SolutionPageState extends State<SolutionDetailsPage> {
     return StopType.Future;
   }
 
-  Future<Train> _trainDetails(Vehicle vehicle) async {
+  Future<TITrain> _trainDetails(TIVehicle vehicle) async {
     final startRes = await http.get(
         "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/${vehicle.numeroTreno}");
     TrainOrigin trainOrigin = trainOriginFromString(startRes.body);

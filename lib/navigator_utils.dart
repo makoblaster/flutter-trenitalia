@@ -4,11 +4,11 @@ import 'package:sqflite/sqlite_api.dart';
 import 'package:treni/db_repository.dart';
 import 'package:treni/solution_list.dart';
 
-import 'model/station.dart';
-import 'model/train_route.dart';
+import 'model/trenitalia/ti_station.dart';
+import 'model/trains/train_route.dart';
 
 class NavigatorUtils{
-  static void searchSolutions(BuildContext context, {DateTime date, DateTime time, Station from, Station to, }) async {
+  static void searchSolutions(BuildContext context, {DateTime date, DateTime time, TIStation from, TIStation to, }) async {
     if (date != null && time != null && from != null && to != null) {
 
       TrainRoute route = await DbRepository.getTrainRouteByStations(from, to);

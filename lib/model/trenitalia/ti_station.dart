@@ -4,27 +4,27 @@
 
 import 'dart:convert';
 
-List<Station> stationFromJson(String str) => List<Station>.from(json.decode(str).map((x) => Station.fromJson(x)));
+List<TIStation> stationFromJson(String str) => List<TIStation>.from(json.decode(str).map((x) => TIStation.fromJson(x)));
 
-String stationToJson(List<Station> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String stationToJson(List<TIStation> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class Station {
+class TIStation {
   String nomeLungo;
   String nomeBreve;
   String label;
   int id;
 
-  Station({
+  TIStation({
     this.nomeLungo,
     this.nomeBreve,
     this.label,
     this.id,
   });
 
-  factory Station.fromJson(Map<String, dynamic> json) {
+  factory TIStation.fromJson(Map<String, dynamic> json) {
     int id = extractId(json["id"]);
 
-    return Station(
+    return TIStation(
         nomeLungo: json["nomeLungo"],
         nomeBreve: json["nomeBreve"],
         label: json["label"] == null ? null : json["label"],

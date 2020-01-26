@@ -1,8 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
-import 'package:treni/model/station.dart';
-import 'package:treni/model/train.dart';
-import 'package:treni/model/train_route.dart';
+import 'package:treni/model/trenitalia/ti_station.dart';
+import 'package:treni/model/trenitalia/ti_train.dart';
+import 'package:treni/model/trains/train_route.dart';
 import 'package:path/path.dart' as path;
 
 class DbRepository {
@@ -31,7 +31,7 @@ class DbRepository {
     }, version: 2);
   }
 
-  static Future<int> insertRoute(Station from, Station to) async {
+  static Future<int> insertRoute(TIStation from, TIStation to) async {
     final Database db = await DbRepository.instance.database;
     print("from id = ${from.id}");
     await db.insert('stations', from.toDbMap(),
@@ -56,7 +56,7 @@ class DbRepository {
     await db.rawUpdate('UPDATE routes SET favorite = $boolean WHERE id = ${route.id};');
   }
 
-  static Future<TrainRoute> getTrainRouteByStations(Station from, Station to) async {
+  static Future<TrainRoute> getTrainRouteByStations(TIStation from, TIStation to) async {
     final Database db = await DbRepository.instance.database;
     final List<Map<String, dynamic>> maps =
     await db.rawQuery('SELECT s1.nomeBreve as fromBreve, s2.nomeBreve as toBreve, r.favorite as favorite, r.id as id, s1.id as fromId, s2.id as toId '
@@ -66,8 +66,8 @@ class DbRepository {
 
     if (maps.length > 0) {
       return TrainRoute(
-          to: Station(nomeBreve: maps[0]['toBreve'], id: maps[0]['toId']),
-          from: Station(nomeBreve: maps[0]['fromBreve'], id: maps[0]['fromId']),
+          to: TIStation(nomeBreve: maps[0]['toBreve'], id: maps[0]['toId']),
+          from: TIStation(nomeBreve: maps[0]['fromBreve'], id: maps[0]['fromId']),
           favorite: maps[0]['favorite'] == 1 ? true : false,
           id: maps[0]['id']);
     } else return null;
@@ -83,8 +83,8 @@ class DbRepository {
     print(maps.toString());
     if (maps.length > 0) {
       return TrainRoute(
-          to: Station(nomeBreve: maps[0]['toBreve'], id: maps[0]['toId']),
-          from: Station(nomeBreve: maps[0]['fromBreve'], id: maps[0]['fromId']),
+          to: TIStation(nomeBreve: maps[0]['toBreve'], id: maps[0]['toId']),
+          from: TIStation(nomeBreve: maps[0]['fromBreve'], id: maps[0]['fromId']),
           favorite: maps[0]['favorite'] == 1 ? true : false,
           id: maps[0]['route_id']);
     } else return null;
@@ -99,8 +99,8 @@ class DbRepository {
     return List.generate(maps.length, (i) {
       return TrainRoute(
           timesUsed: maps[i]['times_used'],
-          to: Station(nomeBreve: maps[i]['toBreve'], id: maps[i]['toId']),
-          from: Station(nomeBreve: maps[i]['fromBreve'], id: maps[i]['fromId']),
+          to: TIStation(nomeBreve: maps[i]['toBreve'], id: maps[i]['toId']),
+          from: TIStation(nomeBreve: maps[i]['fromBreve'], id: maps[i]['fromId']),
           favorite: maps[i]['favorite'] == 1 ? true : false,
           id: maps[i]['id']);
     });
@@ -117,8 +117,8 @@ class DbRepository {
     return List.generate(maps.length, (i) {
       return TrainRoute(
           timesUsed: maps[i]['times_used'],
-          to: Station(nomeBreve: maps[i]['toBreve'], id: maps[i]['toId']),
-          from: Station(nomeBreve: maps[i]['fromBreve'], id: maps[i]['fromId']),
+          to: TIStation(nomeBreve: maps[i]['toBreve'], id: maps[i]['toId']),
+          from: TIStation(nomeBreve: maps[i]['fromBreve'], id: maps[i]['fromId']),
           favorite: maps[i]['favorite'] == 1 ? true : false,
           id: maps[i]['id']);
     });

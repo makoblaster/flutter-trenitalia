@@ -3,7 +3,7 @@ import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
-import 'model/station.dart';
+import 'model/trenitalia/ti_station.dart';
 import 'navigator_utils.dart';
 
 class SearchPage extends StatefulWidget {
@@ -17,14 +17,14 @@ class _SearchPageState extends State<SearchPage> {
 
   DateTime _date;
   DateTime _time;
-  Station _from;
-  Station _to;
+  TIStation _from;
+  TIStation _to;
 
   TextEditingController fromController = TextEditingController();
   TextEditingController toController = TextEditingController();
 
-  Future<Station> _goToStationSearch(BuildContext context, String animationTag, Station station) async {
-    Station result = await Navigator.push(
+  Future<TIStation> _goToStationSearch(BuildContext context, String animationTag, TIStation station) async {
+    TIStation result = await Navigator.push(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
@@ -41,16 +41,20 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _fromSearch() async{
-    Station from = await _goToStationSearch(context, 'from', _from);
+    TIStation from = await _goToStationSearch(context, 'from', _from);
     print("${from.nomeBreve} a");
     setState(() {
       fromController.text = from.nomeBreve;
+      _from = from;
     });
+
   }
 
-  void _toSearch() async{
-    var to = await _goToStationSearch(context, 'to', _to);
+  Future<void> _toSearch() async{
+    TIStation to = await _goToStationSearch(context, 'to', _to);
+    print("${to.nomeBreve} a");
     setState(() {
+      toController.text = to.nomeBreve;
       _to = to;
     });
   }
@@ -266,7 +270,7 @@ class _SearchPageState extends State<SearchPage> {
 }
 
 class StationAutocompleteSearch extends StatefulWidget {
-  final Station station;
+  final TIStation station;
   final String animationTag;
 
   const StationAutocompleteSearch({Key key, this.station, @required this.animationTag}) : super(key: key);
@@ -277,7 +281,7 @@ class StationAutocompleteSearch extends StatefulWidget {
 
 class _StationAutocompleteSearchState extends State<StationAutocompleteSearch> {
   final TextEditingController controller = TextEditingController();
-  List<Station> stations = List();
+  List<TIStation> stations = List();
 
   @override
   void dispose() {

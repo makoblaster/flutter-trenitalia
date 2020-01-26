@@ -1,10 +1,10 @@
-import 'package:treni/model/station.dart';
+import 'package:treni/model/trenitalia/ti_station.dart';
 
 class TrainRoute{
   int id;
   int timesUsed = 0;
-  Station from;
-  Station to;
+  TIStation from;
+  TIStation to;
   bool favorite = false;
 
   TrainRoute({this.from, this.to, this.timesUsed, this.favorite, this.id});

@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 import 'db_repository.dart';
-import 'model/train_route.dart';
+import 'model/trains/train_route.dart';
 import 'navigator_utils.dart';
 
 class RecentPage extends StatefulWidget {
@@ -45,8 +45,11 @@ class _RecentPageState extends State<RecentPage> {
                       List<TrainRoute> routes = snapshot.data;
                       if (routes.length == 0) {
                         return Container(
+                          alignment: Alignment.center,
                           child: Center(
+
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Icon(

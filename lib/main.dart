@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:treni/model/palette.dart';
-import 'package:treni/model/solutions.dart';
+import 'package:treni/model/trains/search_result.dart';
+import 'package:treni/model/trenitalia/ti_solutions.dart';
 import 'package:treni/recent_page.dart';
 import 'package:treni/search_page.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,8 +28,8 @@ class MyApp extends StatelessWidget {
         accentColor: Palette.red,
         fontFamily: 'Rubik',
         buttonTheme: ButtonThemeData(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))
-        ),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)))),
         textTheme: TextTheme(
             title: GoogleFonts.rubik(),
             body1: GoogleFonts.rubik(fontSize: 16),
@@ -65,7 +66,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  List<Soluzione> solutions = List();
   static int _selectedIndex = 0;
 
   final List<Widget> pages = [

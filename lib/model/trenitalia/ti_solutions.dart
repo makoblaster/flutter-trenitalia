@@ -4,25 +4,25 @@
 
 import 'dart:convert';
 
-SolutionRequest solutionRequestFromJson(String str) => SolutionRequest.fromJson(json.decode(str));
+TISolutionRequest solutionRequestFromJson(String str) => TISolutionRequest.fromJson(json.decode(str));
 
-String solutionRequestToJson(SolutionRequest data) => json.encode(data.toJson());
+String solutionRequestToJson(TISolutionRequest data) => json.encode(data.toJson());
 
-class SolutionRequest {
-  List<Soluzione> soluzioni;
+class TISolutionRequest {
+  List<TISoluzione> soluzioni;
   String origine;
   String destinazione;
   dynamic errore;
 
-  SolutionRequest({
+  TISolutionRequest({
     this.soluzioni,
     this.origine,
     this.destinazione,
     this.errore,
   });
 
-  factory SolutionRequest.fromJson(Map<String, dynamic> json) => SolutionRequest(
-    soluzioni: List<Soluzione>.from(json["soluzioni"].map((x) => Soluzione.fromJson(x))),
+  factory TISolutionRequest.fromJson(Map<String, dynamic> json) => TISolutionRequest(
+    soluzioni: List<TISoluzione>.from(json["soluzioni"].map((x) => TISoluzione.fromJson(x))),
     origine: json["origine"],
     destinazione: json["destinazione"],
     errore: json["errore"],
@@ -36,18 +36,18 @@ class SolutionRequest {
   };
 }
 
-class Soluzione {
+class TISoluzione {
   String durata;
-  List<Vehicle> vehicles;
+  List<TIVehicle> vehicles;
 
-  Soluzione({
+  TISoluzione({
     this.durata,
     this.vehicles,
   });
 
-  factory Soluzione.fromJson(Map<String, dynamic> json) => Soluzione(
+  factory TISoluzione.fromJson(Map<String, dynamic> json) => TISoluzione(
     durata: json["durata"],
-    vehicles: List<Vehicle>.from(json["vehicles"].map((x) => Vehicle.fromJson(x))),
+    vehicles: List<TIVehicle>.from(json["vehicles"].map((x) => TIVehicle.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -56,7 +56,7 @@ class Soluzione {
   };
 }
 
-class Vehicle {
+class TIVehicle {
   String origine;
   String destinazione;
   DateTime orarioPartenza;
@@ -65,7 +65,7 @@ class Vehicle {
   String categoriaDescrizione;
   String numeroTreno;
 
-  Vehicle({
+  TIVehicle({
     this.origine,
     this.destinazione,
     this.orarioPartenza,
@@ -75,7 +75,7 @@ class Vehicle {
     this.numeroTreno,
   });
 
-  factory Vehicle.fromJson(Map<String, dynamic> json) => Vehicle(
+  factory TIVehicle.fromJson(Map<String, dynamic> json) => TIVehicle(
     origine: json["origine"],
     destinazione: json["destinazione"],
     orarioPartenza: DateTime.parse(json["orarioPartenza"]),

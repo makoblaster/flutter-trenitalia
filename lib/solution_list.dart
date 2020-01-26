@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:treni/db_repository.dart';
+import 'package:treni/model/trains/search_result.dart';
 import 'package:treni/solution_details.dart';
-import 'package:treni/model/solutions.dart';
-import 'package:treni/model/station.dart';
+import 'package:treni/model/trenitalia/ti_solutions.dart';
+import 'package:treni/model/trenitalia/ti_station.dart';
 import 'package:http/http.dart' as http;
 
 import 'model/palette.dart';
-import 'model/train_route.dart';
+import 'model/trains/train_route.dart';
 
 class SolutionListPage extends StatefulWidget {
   final TrainRoute route;
@@ -26,7 +27,7 @@ class SolutionListPage extends StatefulWidget {
 }
 
 class _SolutionListPageState extends State<SolutionListPage> {
-  List<Soluzione> solutions;
+  List<TISoluzione> solutions;
 
   @override
   void initState() {
@@ -89,7 +90,7 @@ class SolutionListView extends StatefulWidget {
     @required this.solutions,
   }) : super(key: key);
 
-  final List<Soluzione> solutions;
+  final List<TISoluzione> solutions;
 
   @override
   _SolutionListViewState createState() => _SolutionListViewState();
@@ -103,7 +104,7 @@ class _SolutionListViewState extends State<SolutionListView> {
         return ListView.separated(
           shrinkWrap: true,
           itemBuilder: (BuildContext context, int index) {
-            Soluzione sol = widget.solutions[index];
+            TISoluzione sol = widget.solutions[index];
             return Column(
               children: <Widget>[
                 InkWell(
@@ -136,7 +137,7 @@ class _SolutionListViewState extends State<SolutionListView> {
                                 ),
                               ),
                               Text(
-                                sol.durata,
+                                sol.durata ?? "--:--",
                                 style: TextStyle(color: Theme
                                     .of(context)
                                     .disabledColor),
@@ -225,7 +226,7 @@ class _SolutionListViewState extends State<SolutionListView> {
     return "$cambi cambi:  ";
   }
 
-  void _solutionDetails(BuildContext context, Soluzione solution) async {
+  void _solutionDetails(BuildContext context, TISoluzione solution) async {
     await Navigator.push(
         context,
         PageRouteBuilder(

@@ -4,11 +4,11 @@
 
 import 'dart:convert';
 
-Train trainFromJson(String str) => Train.fromJson(json.decode(str));
+TITrain trainFromJson(String str) => TITrain.fromJson(json.decode(str));
 
-String trainToJson(Train data) => json.encode(data.toJson());
+String trainToJson(TITrain data) => json.encode(data.toJson());
 
-class Train {
+class TITrain {
   int getCurrentStationIndex() {
     for (int i  = 0; i < fermate.length; i++){
       if (fermate[i].stazione == stazioneUltimoRilevamento){
@@ -38,7 +38,7 @@ class Train {
     return -1;
   }
 
-  Fermata getFermataPartenzaByTime(DateTime orarioPartenza){
+  TIFermata getFermataPartenzaByTime(DateTime orarioPartenza){
     return fermate.firstWhere((x) {
       DateTime trainTime = DateTime.fromMillisecondsSinceEpoch(x.partenzaTeorica);
       print("${trainTime.hour}:${trainTime.minute} - ${orarioPartenza.hour}:${orarioPartenza.minute}");
@@ -51,7 +51,7 @@ class Train {
   int codiceCliente;
   dynamic fermateSoppresse;
   dynamic dataPartenza;
-  List<Fermata> fermate;
+  List<TIFermata> fermate;
   dynamic anormalita;
   dynamic provvedimenti;
   dynamic segnalazioni;
@@ -131,7 +131,7 @@ class Train {
   String compDurata;
   String compImgCambiNumerazione;
 
-  Train({
+  TITrain({
     this.tipoTreno,
     this.orientamento,
     this.codiceCliente,
@@ -218,13 +218,13 @@ class Train {
     this.compImgCambiNumerazione,
   });
 
-  factory Train.fromJson(Map<String, dynamic> json) => Train(
+  factory TITrain.fromJson(Map<String, dynamic> json) => TITrain(
     tipoTreno: json["tipoTreno"],
     orientamento: json["orientamento"],
     codiceCliente: json["codiceCliente"],
     fermateSoppresse: json["fermateSoppresse"],
     dataPartenza: json["dataPartenza"],
-    fermate: List<Fermata>.from(json["fermate"].map((x) => Fermata.fromJson(x))),
+    fermate: List<TIFermata>.from(json["fermate"].map((x) => TIFermata.fromJson(x))),
     anormalita: json["anormalita"],
     provvedimenti: json["provvedimenti"],
     segnalazioni: json["segnalazioni"],
@@ -415,7 +415,7 @@ class CambiNumero {
   };
 }
 
-class Fermata {
+class TIFermata {
   dynamic orientamento;
   dynamic kcNumTreno;
   String stazione;
@@ -452,7 +452,7 @@ class Fermata {
   int actualFermataType;
   dynamic materialeLabel;
 
-  Fermata({
+  TIFermata({
     this.orientamento,
     this.kcNumTreno,
     this.stazione,
@@ -490,7 +490,7 @@ class Fermata {
     this.materialeLabel,
   });
 
-  factory Fermata.fromJson(Map<String, dynamic> json) => Fermata(
+  factory TIFermata.fromJson(Map<String, dynamic> json) => TIFermata(
     orientamento: json["orientamento"],
     kcNumTreno: json["kcNumTreno"],
     stazione: json["stazione"],
